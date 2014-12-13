@@ -10,4 +10,5 @@ HEADERS += \
     buttonstack.h
 
 SOURCES += \
-    buttonstack.cpp
+    buttonstack.cpp \
+    main.cpp
