@@ -115,9 +115,7 @@ bool ButtonStack::addButton(const QString& name, QWidget* qwidget, const QUrl & 
                               Q_ARG(QVariant, ((onHover.isValid()) ? onHover.name() : "")));
 
     if (fSucceed.value<bool>()){
-        Q_DEBUG<< "Button" << name << "has been successfully created";
-      QQuickWidget * Edg =qobject_cast<QQuickWidget *>( rootItem->findChild<QObject *>(name));
-
+        Q_DEBUG<< "Button" << name << "has been successfully created";     
         QQuickItem * qButtonItem = rootItem->findChild<QQuickItem *>(name);
         if(qButtonItem){
             buttonMap[name] = QPair<QWidget*, QQuickItem*>(qwidget, qButtonItem);
