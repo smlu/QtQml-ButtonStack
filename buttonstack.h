@@ -81,12 +81,14 @@ public:
      * @param right
      * @param bottom
     */
-    void setContentsMargins(int, int, int, int);
+    void setContentsMargins(int, int, int, int);    
 
 protected:
     QQuickWidget * rootWidg;
     QQuickItem *   rootItem;
     QMap<QString, QPair<QWidget*, QQuickItem*> > buttonMap;
+    virtual void resizeEvent(QResizeEvent*);
+
 
 private:
     void Init();  
@@ -99,7 +101,6 @@ signals:
 private slots:
     void buttonClicked(QString);
     void buttonFocusChanged(QString, QString);
-    void stackWidthChanged();
 };
 
 #endif // BUTTONSTACK_H

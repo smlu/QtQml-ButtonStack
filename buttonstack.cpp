@@ -18,29 +18,26 @@ ButtonStack::ButtonStack(const QColor & color, QWidget *parent):
 
 void ButtonStack::Init()
 {
-    Q_DEBUG_FUNINF
-
-    /* set main layout */
-    m_layout = new QHBoxLayout();
-    m_layout->setSpacing(0);
-    m_layout->setMargin(0);
-    m_layout->setStretch(0,0);
+    Q_DEBUG_FUNINF    
 
     /* set buttonstack qml */
     rootWidg = new QQuickWidget(QUrl("qrc:/qml/stack.qml"));
     rootWidg->setResizeMode(QQuickWidget::SizeViewToRootObject);
 
-    // get buttonstack
+    // get buttonstack item
     rootItem = rootWidg->rootObject();
 
     /* connect buttonstack */
-    connect(rootItem, SIGNAL(widthChanged()), SLOT(stackWidthChanged()));
-    connect(rootItem, SIGNAL(implicitWidthChanged()), SLOT(stackWidthChanged()));
     connect(rootItem, SIGNAL(clicked(QString)), SLOT(buttonClicked(QString)));
     connect(rootItem, SIGNAL(focusChanged(QString, QString)), SLOT(buttonFocusChanged(QString, QString)));
 
-    m_layout->addWidget(rootWidg);
-    this->setLayout(m_layout);
+    /* set main layout */
+    m_layout = new QHBoxLayout();
+    m_layout->addWidget(rootWidg,0, Qt::AlignLeft);
+    m_layout->setSpacing(0);
+    m_layout->setMargin(0);
+    m_layout->setStretch(0,0);
+    this->setLayout(m_layout);    
 }
 
 ButtonStack::~ButtonStack()
@@ -64,33 +61,22 @@ void ButtonStack::buttonFocusChanged(QString fromButton, QString toButton)
     Q_DEBUG_FUNINF
     Q_DEBUG<<"focus has changed from button:"<< fromButton << "to button:"<<toButton;
 
-
+    /* if previous button has widget, hide it*/
     if(buttonMap[fromButton].first)
         buttonMap[fromButton].first->hide();
 
+    /* does current selected button has widget assignet to it*/
     if(buttonMap[toButton].first){
-        Q_DEBUG <<  buttonMap[toButton].first->width();
+        Q_DEBUG <<  "widget width:" << buttonMap[toButton].first->width();
+
+        /* resize our widget to width of buttonstack + width of widget assigned to selected button */
         this->resize( rootWidg->width() + buttonMap[toButton].first->width(), this->height());
+
+        /* show widget that is assigned to selected button */
         buttonMap[toButton].first->show();
     }
-    else
-        this->resize( rootWidg->width() + 1, this->height());
-
 
     emit focusChanged(fromButton, toButton);
-}
-
-void ButtonStack::stackWidthChanged()
-{
-    Q_DEBUG_FUNINF
-    qreal w = rootItem->width();
-    Q_DEBUG<< w;
-
-    rootWidg->setMinimumWidth(w);
-    if (w != 0)
-        rootWidg->setMaximumWidth(w+1);
-
-    this->resize(w+1, this->height());
 }
 
 bool ButtonStack::addButton(const QString& name, const QUrl & ImageSource, const QColor & button,  const QColor & onClick, const  QColor & onHover)
@@ -103,6 +89,7 @@ bool ButtonStack::addButton(const QString& name, QWidget* qwidget, const QUrl & 
 {
     Q_DEBUG_FUNINF
 
+    /* call qml methode to create button */
     QVariant fSucceed;
     QMetaObject::invokeMethod(rootItem,
                               "addButton",
@@ -114,13 +101,15 @@ bool ButtonStack::addButton(const QString& name, QWidget* qwidget, const QUrl & 
 
                               Q_ARG(QVariant, ((onHover.isValid()) ? onHover.name() : "")));
 
+    /* if succeedd add button to buttonMap */
     if (fSucceed.value<bool>()){
-        Q_DEBUG<< "Button" << name << "has been successfully created";     
+        Q_DEBUG<< "Button" << name << "has been successfully created";
+
         QQuickItem * qButtonItem = rootItem->findChild<QQuickItem *>(name);
         if(qButtonItem){
             buttonMap[name] = QPair<QWidget*, QQuickItem*>(qwidget, qButtonItem);
             if(qwidget){
-                m_layout->addWidget(qwidget);
+                m_layout->addWidget(qwidget,1);
                 qwidget->hide();
             }
             Q_DEBUG << "Button" << name << "has been added to the map";
@@ -143,7 +132,7 @@ void ButtonStack::removeButton(const QString & button)
          buttonMap.remove(button);
     }
 
-    /* reset button size */
+    /* re-set button size */
     rootItem->setProperty("numOfButtons", QVariant(buttonMap.count()));
 }
 
@@ -177,6 +166,17 @@ void ButtonStack::setContentsMargins(int l, int t, int r, int b)
 {
     Q_DEBUG_FUNINF
     m_layout->setContentsMargins(l, t, r ,b );
+}
+
+void ButtonStack::resizeEvent(QResizeEvent * e)
+{
+    Q_DEBUG_FUNINF
+    e->ignore();
+    rootItem->setHeight(e->size().height());
+    rootWidg->resize(rootItem->width(), e->size().height());
+    rootWidg->setMinimumWidth(rootItem->width());
+
+    e->accept();
 }
 
 void ButtonStack::setLayoutSpacing(int n)
