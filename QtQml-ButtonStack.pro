@@ -6,7 +6,7 @@ TARGET = qtqml_buttonstack
 TEMPLATE = app
 
 RESOURCES += \
-    resource.qrc
+    buttonstack.qrc
 
 HEADERS += \
     buttonstack.h
