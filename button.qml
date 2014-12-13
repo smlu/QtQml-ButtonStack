@@ -31,10 +31,11 @@ id: buttonId
 
     Image {
         id: image
-        width: parentObj.buttonSize/3.2
-        height: parentObj.buttonSize/3.5
-        //anchors.verticalCenterOffset: -8
+        antialiasing: true
+        width: parentObj.buttonSize/2.8
+        height: parentObj.buttonSize/2.8
         anchors.verticalCenter: parent.verticalCenter
+        anchors.verticalCenterOffset: -5
         anchors.horizontalCenter: parent.horizontalCenter
         source: parent.imageSource
     }
@@ -78,6 +79,7 @@ id: buttonId
     }
 
     Text  {
+        antialiasing: true
         color: {
             if (mArea.pressed || parentObj.clickedButton.objectName === parent.objectName)
                 return "#cccccc"
@@ -87,16 +89,16 @@ id: buttonId
                 return "#cccccc"
         }
         text: parent.label
-        font.pointSize: 10
+        font.pointSize: Math.ceil(Math.sqrt(buttonId.height)) +2
+        wrapMode: Text.WordWrap
+        anchors.verticalCenter: parent.verticalCenter
         anchors.verticalCenterOffset: {
             if(image.source == '')
                 return 0
             else
-                return image.height /2 +10
+                return Math.ceil(image.height /2) + Math.ceil(Math.sqrt(buttonId.height))
 
         }
-        wrapMode: Text.WordWrap
-        anchors.verticalCenter: parent.verticalCenter
         anchors.horizontalCenter: parent.horizontalCenter
         styleColor: "#ffffff"
     }
