@@ -53,7 +53,7 @@ int main(int argc, char *argv[])
     Widget4* w4 = new Widget4;
 
     ButtonStack* bs = new ButtonStack;
-    bs->addButton("Button 1", w1, QUrl(), QColor(0, 150, 0), QColor(150, 0, 0), QColor(150, 150, 255));
+    bs->addButton("Button 1", w1, QUrl("http://simpleicon.com/wp-content/uploads/smile-128x128.png"), QColor(0, 150, 0), QColor(150, 0, 0), QColor(150, 150, 255));
     bs->addButton("Button 2", w2);
     bs->addButton("Button 3", w3);
     bs->addButton(w4->getBtnName());
