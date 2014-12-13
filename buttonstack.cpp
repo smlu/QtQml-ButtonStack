@@ -26,8 +26,8 @@ void ButtonStack::Init()
     m_layout->setMargin(0);
     m_layout->setStretch(0,0);
 
-    /* set qml buttonstack*/
-    rootWidg = new QQuickWidget(QUrl("qrc:/stack.qml"));
+    /* set buttonstack qml */
+    rootWidg = new QQuickWidget(QUrl("qrc:/qml/stack.qml"));
     rootWidg->setResizeMode(QQuickWidget::SizeViewToRootObject);
 
     // get buttonstack

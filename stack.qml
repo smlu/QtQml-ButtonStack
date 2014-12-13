@@ -25,7 +25,7 @@ Rectangle {
     signal qmlErrors(string Error)
 
     // global button properties
-    property var button: Qt.createComponent("qrc:/button.qml")
+    property var button: Qt.createComponent("qrc:/qml/button.qml")
     property color defaultButtonColor:  "#111111"
     property color defaultOnHoverColor: "#cccccc"
     property color defaultOnClickColor: "#333333"
