@@ -4,7 +4,7 @@ Rectangle {
     id: buttonstack    
     objectName: "buttonStack"
     property real pw : {
-        return buttonSize + (Math.sqrt(Math.pow(focusMarker.width,2)+ Math.pow(focusMarker.height,2)) /2 + 2)
+        return buttonSize + (Math.sqrt(Math.pow(focusMarker.width,2)+ Math.pow(focusMarker.height,2)) /2)
     }
     property real ph : parent!=null?parent.height:484
     width: pw
@@ -31,7 +31,8 @@ Rectangle {
     property color defaultOnClickColor: "#333333"
     property int numOfButtons: 0
     property int buttonSize:   (height/numOfButtons)+1
-    property Rectangle selectedButton: Rectangle{objectName:"default"; x: -100; y: -(buttonstack.y - 100 + focusMarker.height)}
+    property Rectangle clickedButton: Rectangle{objectName:"default"; x: -100; y: -(buttonstack.y - 100 + focusMarker.height); visible: false}
+    property Rectangle hoveredButton: clickedButton
 
 
     // focused button marker
@@ -41,10 +42,10 @@ Rectangle {
         width: Math.sqrt(buttonstack.height)
         height:Math.sqrt(buttonstack.height)
         x: buttonstack.buttonSize - (width/2)
-        y: buttonstack.selectedButton.y + (buttonstack.buttonSize /2) - (height /2);
+        y: buttonstack.hoveredButton.y + (buttonstack.buttonSize /2) - (height /2);
         rotation: 45
-        color: buttonstack.selectedButton.color
-        visible: false
+        color: buttonstack.hoveredButton.color
+        visible: hoveredButton.visible
         Behavior on y {
             NumberAnimation {
                 duration: 600
@@ -80,8 +81,6 @@ Rectangle {
 
         return false;
     }
-
-
 
     /* Layout **/
 

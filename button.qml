@@ -9,14 +9,14 @@ id: buttonId
     property color onClickColor;
     property color onHoverColor;
     property Rectangle parentObj: buttonstack;
-    property Rectangle _focusMarker: focusMarker;
+    property Rectangle clickedButton;
     /**************************************************************/
 
 
     width:  parentObj.buttonSize
     height: parentObj.buttonSize
     color: {
-        if (mArea.pressed || parentObj.selectedButton.objectName === objectName)
+        if (mArea.pressed || parentObj.clickedButton.objectName === objectName)
             return onClickColor
         else if(mArea.containsMouse)
             return onHoverColor
@@ -40,15 +40,12 @@ id: buttonId
     }
 
 
-    function setFocus(){        
-        parentObj.selectedButton = buttonId;
-        // Marker
-        _focusMarker.color = parentObj.selectedButton.color;
-        _focusMarker.visible = true;
-        if(parentObj.selectedButton.y )
-            _focusMarker.y = parentObj.selectedButton.y + (parentObj.buttonSize /2) - (_focusMarker.height /2);
-        //emit Signal
-        parentObj.clicked(parentObj.selectedButton.objectName)
+    function setFocus(){
+        var previousBtn = parentObj.hoveredButton.objectName;
+        parentObj.clickedButton= buttonId;
+        parentObj.hoveredButton = buttonId;
+        parentObj.focusChanged(previousBtn, parentObj.hoveredButton.objectName)
+        parentObj.clicked(parentObj.clickedButton.objectName)
     }
 
     MouseArea {
@@ -56,46 +53,38 @@ id: buttonId
         anchors.fill: parent
         acceptedButtons: Qt.LeftButton
         onClicked: {
-            parentObj.selectedButton = parent;
-            // Marker
-            _focusMarker.color = parentObj.selectedButton.color;
-            _focusMarker.visible = true;
-            _focusMarker.y = parentObj.selectedButton.y + (parentObj.buttonSize /2) - (_focusMarker.height /2);
-            //emit Signal
-            parentObj.clicked(parent.objectName)
+            parentObj.clickedButton = buttonId;
+
+            //emit Signal            
+            parentObj.clicked(buttonId.objectName)
         }
         hoverEnabled: true
         onEntered: {
-            if(parentObj.selectedButton.objectName !== parent.objectName) {              
-               // Marker
-                _focusMarker.color = parent.color;
-                _focusMarker.visible = true;
-                _focusMarker.y = parent.y + (parentObj.buttonSize /2) - (_focusMarker.height /2);
+            if(parentObj.clickedButton.objectName !== parent.objectName) {
+                parentObj.hoveredButton = buttonId;
 
                 // emit signal
-                parentObj.focusChanged(parentObj.selectedButton.objectName, parent.objectName)
+                parentObj.focusChanged(parentObj.clickedButton.objectName, buttonId.objectName)
             }
         }
         onExited: {
-            if(parentObj.selectedButton.objectName !== parent.objectName) {
-                //Marker
-                _focusMarker.color = parentObj.selectedButton.color
-                _focusMarker.y = parentObj.selectedButton.y + (parentObj.buttonSize /2) - (_focusMarker.height /2);
+            if(parentObj.clickedButton.objectName !== parent.objectName) {
+                parentObj.hoveredButton = parentObj.clickedButton;
 
                 // emit signal
-                parentObj.focusChanged(parent.objectName, selectedButton.objectName)
+                parentObj.focusChanged(buttonId.objectName, parentObj.clickedButton.objectName)
             }
         }
     }
 
     Text  {
         color: {
-            if (mArea.pressed || parentObj.selectedButton.objectName === parent.objectName)
-                return onHoverColor
+            if (mArea.pressed || parentObj.clickedButton.objectName === parent.objectName)
+                return "#cccccc"
             else if(mArea.containsMouse)
-                return onClickColor
+                return "#333333"
             else
-                return onHoverColor
+                return "#cccccc"
         }
         text: parent.label
         font.pointSize: 10
