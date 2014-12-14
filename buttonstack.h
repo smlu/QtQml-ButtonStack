@@ -35,7 +35,7 @@ public:
      *
      * @param button name
      * @param button icon source path
-     * @paramthe color of button
+     * @param the color of button
      * @param the color of button when clicked
      * @param the color of button when hover over
      *
@@ -48,7 +48,7 @@ public:
      * @param button name
      * @param qwidget to control
      * @param button icon source path
-     * @paramthe color of button
+     * @param the color of button
      * @param the color of button when clicked
      * @param the color of button when hover over
      *
@@ -56,10 +56,16 @@ public:
      */
     bool addButton(const QString& , QWidget*, const QUrl & ImageSource= QUrl("") ,const QColor & button= "",  const QColor & onClick= "", const  QColor & onHover= "");
 
-    /** remove button*/
+    /** remove button
+     *
+     * @param button name
+     */
     void removeButton(const QString &);
 
-    /** set focus on button*/  
+    /** set focus on button
+     *
+     * @param button name
+     */
     void setButtonFocus(const QString &);
 
     /** set widget background color */
@@ -68,7 +74,10 @@ public:
     /** switch button*/
     void switchButton(const QString &, const QString &);
 
-    /* set space between buttonstack and widget */
+    /** set space between buttonstack and widget
+     *
+     * @param nSpace
+     */
     void setLayoutSpacing(int);
 
     /** set content margin */

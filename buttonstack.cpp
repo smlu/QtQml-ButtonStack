@@ -98,7 +98,6 @@ bool ButtonStack::addButton(const QString& name, QWidget* qwidget, const QUrl & 
                               Q_ARG(QVariant, ImageSource),
                               Q_ARG(QVariant, ((button.isValid())  ? button.name() : "")),
                               Q_ARG(QVariant, ((onClick.isValid()) ? onClick.name() : "")),
-
                               Q_ARG(QVariant, ((onHover.isValid()) ? onHover.name() : "")));
 
     /* if succeedd add button to buttonMap */
@@ -107,11 +106,13 @@ bool ButtonStack::addButton(const QString& name, QWidget* qwidget, const QUrl & 
 
         QQuickItem * qButtonItem = rootItem->findChild<QQuickItem *>(name);
         if(qButtonItem){
-            buttonMap[name] = QPair<QWidget*, QQuickItem*>(qwidget, qButtonItem);
             if(qwidget){
+                qwidget->setMinimumHeight(this->height());
+                qwidget->setMaximumHeight(this->height());
                 m_layout->addWidget(qwidget,1);
                 qwidget->hide();
             }
+            buttonMap[name] = QPair<QWidget*, QQuickItem*>(qwidget, qButtonItem);
             Q_DEBUG << "Button" << name << "has been added to the map";
         }
         else
@@ -127,9 +128,10 @@ void ButtonStack::removeButton(const QString & button)
 {
     Q_DEBUG_FUNINF
 
-    if(buttonMap.contains(button)){
-         delete buttonMap[button].second;
-         buttonMap.remove(button);
+    if(buttonMap.contains(button)){        
+        m_layout->removeWidget(buttonMap[button].first);
+        delete buttonMap[button].second;
+        buttonMap.remove(button);
     }
 
     /* re-set button size */
