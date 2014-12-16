@@ -32,10 +32,11 @@ id: buttonId
     Image {
         id: image
         antialiasing: true
-        width: parentObj.buttonSize/2.8
-        height: parentObj.buttonSize/2.8
+        //width: parentObj.buttonSize/3.0
+        //height: parentObj.buttonSize/3.3
+        scale: parentObj.buttonSize*0.009
         anchors.verticalCenter: parent.verticalCenter
-        anchors.verticalCenterOffset: -5
+        anchors.verticalCenterOffset: parentObj.buttonSize *0.05
         anchors.horizontalCenter: parent.horizontalCenter
         source: parent.imageSource
     }
@@ -89,14 +90,14 @@ id: buttonId
                 return "#cccccc"
         }
         text: parent.label
-        font.pointSize: Math.ceil(Math.sqrt(buttonId.height)) +2
+        font.pointSize: Math.round(Math.sqrt(buttonId.height) *0.9)
         wrapMode: Text.WordWrap
         anchors.verticalCenter: parent.verticalCenter
         anchors.verticalCenterOffset: {
             if(image.source == '')
                 return 0
             else
-                return Math.ceil(image.height /2) + Math.ceil(Math.sqrt(buttonId.height))
+                return parentObj.buttonSize *0.3
 
         }
         anchors.horizontalCenter: parent.horizontalCenter

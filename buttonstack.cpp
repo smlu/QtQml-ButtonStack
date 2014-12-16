@@ -22,7 +22,7 @@ void ButtonStack::Init()
 
     /* set buttonstack qml */
     rootWidg = new QQuickWidget(QUrl("qrc:/qml/stack.qml"));
-    rootWidg->setResizeMode(QQuickWidget::SizeViewToRootObject);
+    //rootWidg->setResizeMode(QQuickWidget::SizeViewToRootObject);
 
     // get buttonstack item
     rootItem = rootWidg->rootObject();
@@ -70,7 +70,7 @@ void ButtonStack::buttonFocusChanged(QString fromButton, QString toButton)
         Q_DEBUG <<  "widget width:" << buttonMap[toButton].first->width();
 
         /* resize our widget to width of buttonstack + width of widget assigned to selected button */
-        this->resize( rootWidg->width() + buttonMap[toButton].first->width(), this->height());
+        this->setMinimumWidth(rootWidg->width() + buttonMap[toButton].first->width());
 
         /* show widget that is assigned to selected button */
         buttonMap[toButton].first->show();
@@ -108,8 +108,8 @@ bool ButtonStack::addButton(const QString& name, QWidget* qwidget, const QUrl & 
         if(qButtonItem){
             if(qwidget){
                 qwidget->setMinimumHeight(this->height());
-                qwidget->setMaximumHeight(this->height());
-                m_layout->addWidget(qwidget,1);
+                //qwidget->setMaximumHeight(this->height());
+                m_layout->addWidget(qwidget,1);                
                 qwidget->hide();
             }
             buttonMap[name] = QPair<QWidget*, QQuickItem*>(qwidget, qButtonItem);
@@ -174,9 +174,19 @@ void ButtonStack::resizeEvent(QResizeEvent * e)
 {
     Q_DEBUG_FUNINF
     e->ignore();
+    Q_DEBUG<<e->size();
     rootItem->setHeight(e->size().height());
-    rootWidg->resize(rootItem->width(), e->size().height());
-    rootWidg->setMinimumWidth(rootItem->width());
+
+    if(rootItem->width() > 0){
+        rootWidg->setMinimumWidth(rootItem->width());
+        rootWidg->resize(rootItem->width(), e->size().height());
+    }
+    //this->resize(e->size());
+
+    QPair<QWidget*, QQuickItem*>b;
+    foreach( b,buttonMap){
+        if(b.first) b.first->resize(e->size().width() - rootWidg->width(), e->size().height());
+    }
 
     e->accept();
 }
