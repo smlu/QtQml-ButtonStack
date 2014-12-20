@@ -147,6 +147,7 @@ void ButtonStack::setButtonFocus(const QString & button)
 void ButtonStack::setBackgroundColor(const QColor & color)
 {
     Q_DEBUG_FUNINF
+    setStyleSheet(QString("background-color: %1;").arg(color.name()));
     rootItem->setProperty("color", QVariant(color.name()));
 }
 
