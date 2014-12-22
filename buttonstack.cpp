@@ -70,7 +70,7 @@ void ButtonStack::buttonFocusChanged(QString fromButton, QString toButton)
         Q_DEBUG <<  "widget width:" << buttonMap[toButton].first->width();
 
         /* resize our widget to width of buttonstack + width of widget assigned to selected button */
-        this->setMinimumWidth(rootWidg->width() + buttonMap[toButton].first->width());
+        //this->setMinimumWidth(rootWidg->width() + buttonMap[toButton].first->width());
 
         /* show widget that is assigned to selected button */
         buttonMap[toButton].first->show();
@@ -106,20 +106,18 @@ bool ButtonStack::addButton(const QString& name, QWidget* qwidget, const QUrl & 
 
         QQuickItem * qButtonItem = rootItem->findChild<QQuickItem *>(name);
         if(qButtonItem){
-            if(qwidget){
-                qwidget->setMinimumHeight(this->height());
-                //qwidget->setMaximumHeight(this->height());
-                m_layout->addWidget(qwidget,1);                
+            if(qwidget){                
+                m_layout->addWidget(qwidget);
                 qwidget->hide();
             }
             buttonMap[name] = QPair<QWidget*, QQuickItem*>(qwidget, qButtonItem);
             Q_DEBUG << "Button" << name << "has been added to the map";
         }
         else
-            qCritical( )<< "Could not find child" << name;
+            qCritical( )<< Q_FUNC_INFO << "Could not find child" << name;
     }
     else
-        qCritical()<< "Something went wrong while trying to create button" << name;
+        qCritical()<< Q_FUNC_INFO << "Something went wrong while trying to create button" << name;
 
     return fSucceed.value<bool>();
 }
