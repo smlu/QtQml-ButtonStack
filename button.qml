@@ -33,8 +33,8 @@ id: buttonId
         id: image
         antialiasing: true
         width: parentObj.buttonSize/3.0
-        height: parentObj.buttonSize/3.0
-        //scale: parentObj.buttonSize * 0.009
+        height: parentObj.buttonSize/3.3
+        scale: parentObj.buttonSize * 0.009
         anchors.verticalCenter: parent.verticalCenter
         anchors.verticalCenterOffset: parentObj.buttonSize *0.05
         anchors.horizontalCenter: parent.horizontalCenter
