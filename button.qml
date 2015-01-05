@@ -90,7 +90,7 @@ id: buttonId
                 return "#cccccc"
         }
         text: parent.label
-        font.pointSize: Math.round(Math.sqrt(buttonId.height) *0.9)
+        font.pointSize: Math.round(Math.sqrt(buttonId.height) *1.3)
         wrapMode: Text.WordWrap
         anchors.verticalCenter: parent.verticalCenter
         anchors.verticalCenterOffset: {

@@ -26,7 +26,7 @@ Rectangle {
 
     // global button properties
     property var button: Qt.createComponent("qrc:/qml/button.qml")
-    property color defaultButtonColor:  "#111111"
+    property color defaultButtonColor:  "#222222"
     property color defaultOnHoverColor: "#cccccc"
     property color defaultOnClickColor: "#333333"
     property int numOfButtons: 0
