@@ -31,12 +31,11 @@ id: buttonId
 
     Image {
         id: image
-        antialiasing: true
-        width: parentObj.buttonSize/3.0
-        height: parentObj.buttonSize/3.3
-        scale: parentObj.buttonSize * 0.009
+        antialiasing: true     
+        scale: (1/4) / ((sourceSize.height) / parentObj.buttonSize)
+
         anchors.verticalCenter: parent.verticalCenter
-        anchors.verticalCenterOffset: parentObj.buttonSize *0.05
+        anchors.verticalCenterOffset: - parentObj.buttonSize *0.05
         anchors.horizontalCenter: parent.horizontalCenter
         source: parent.imageSource
     }
@@ -90,14 +89,14 @@ id: buttonId
                 return "#cccccc"
         }
         text: parent.label
-        font.pointSize: Math.round(Math.sqrt(buttonId.height) *1.3)
+        font.pointSize: Math.sqrt(buttonId.height) * ( Qt.platform.os === "osx" ? 1.3 : 1)
         wrapMode: Text.WordWrap
         anchors.verticalCenter: parent.verticalCenter
         anchors.verticalCenterOffset: {
             if(image.source == '')
                 return 0
             else
-                return parentObj.buttonSize *0.3
+                return parentObj.buttonSize *0.20
 
         }
         anchors.horizontalCenter: parent.horizontalCenter
