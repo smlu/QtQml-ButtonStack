@@ -32,7 +32,7 @@ id: buttonId
     Image {
         id: image
         antialiasing: true     
-        scale: (1/4) / ((sourceSize.height) / parentObj.buttonSize)
+        scale: (1/3.7) / ((sourceSize.height) / parentObj.buttonSize)
 
         anchors.verticalCenter: parent.verticalCenter
         anchors.verticalCenterOffset: - parentObj.buttonSize *0.05
