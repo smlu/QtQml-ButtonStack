@@ -4,9 +4,9 @@ Rectangle {
     id: buttonstack    
     objectName: "buttonStack"
     property real pw : {
-        return buttonSize + (Math.sqrt(Math.pow(focusMarker.width,2)+ Math.pow(focusMarker.height,2)) /2)
+        return buttonSize + (Math.sqrt(Math.pow(focusMarker.width,2)+ Math.pow(focusMarker.height, 2)) /2)
     }
-    property real ph : parent!=null?parent.height:484
+    property real ph : parent!=null ? parent.height:484
     width: pw
     height: ph
     color: "#80cccccc"
@@ -18,6 +18,7 @@ Rectangle {
 
     // signal is sent when focus on button changes
     signal focusChanged(string fromObjName, string toObjName)
+
     // signal when button is clicked
     signal clicked(string objectName)    
 
@@ -61,19 +62,20 @@ Rectangle {
         if(typeof(onHoverColor)==='undefined' || onHoverColor === '') onHoverColor = defaultOnHoverColor;
 
         var sprite = button.incubateObject(layout, {                                               
-                                               "id": button+name,
-                                               "objectName": name,
-                                               "buttonColor":  buttonColor,
-                                               "onClickColor": onClickColor,
-                                               "onHoverColor": onHoverColor,
-                                               "label": name,
-                                               "imageSource": imageSource
-                                           });
-        if (sprite !== null){
-            numOfButtons ++;
+            "id": button + name,
+            "objectName": name,
+            "buttonColor":  buttonColor,
+            "onClickColor": onClickColor,
+            "onHoverColor": onHoverColor,
+            "label": name,
+            "imageSource": imageSource
+        });
+
+        if (sprite !== null) {
+            numOfButtons++;
             return true;
         }
-        else{
+        else {
             // Error Handling
             qmlErrors("error creating button " + name);
             console.log("Error creating button " + name );
