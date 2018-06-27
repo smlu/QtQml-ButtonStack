@@ -4,13 +4,14 @@
 #include <QObject>
 #include <QString>
 
-#include "buttonstack.h"
+#include "../src/buttonstack.h"
 
 class Widget4 : public QWidget
 {
     Q_OBJECT
 public:
-    inline explicit Widget4(QWidget *parent=0) :   QWidget(parent){
+    inline explicit Widget4(QWidget* parent = nullptr) :   QWidget(parent)
+    {
         setWindowFlags(Qt::Dialog | Qt::WindowStaysOnTopHint);
         this->resize(250,250);
         setStyleSheet("background-color: rgb(0,0 ,255);");
@@ -22,16 +23,21 @@ public:
     }
 
 public slots:
-    inline void focusChangeSet(QString fromBtn, QString toBtn){
-        if(toBtn == m_btnName)
+    inline void focusChangeSet(QString fromBtn, QString toBtn)
+    {
+        Q_UNUSED(fromBtn)
+        if(toBtn == m_btnName) {
             this->show();
-        else
+        }
+        else {
             this->hide();
+        }
     }
 
 private:
     QString  m_btnName;
 };
+
 #include "main.moc"
 
 int main(int argc, char *argv[])

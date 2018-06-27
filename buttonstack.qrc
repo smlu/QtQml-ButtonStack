@@ -1,6 +1,0 @@
-<RCC>
-    <qresource prefix="/qml">
-        <file>button.qml</file>
-        <file>stack.qml</file>
-    </qresource>
-</RCC>
