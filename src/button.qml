@@ -1,4 +1,4 @@
-import QtQuick 2.0
+import QtQuick 2.3
 
 Rectangle  {
 id: buttonId
@@ -33,14 +33,13 @@ id: buttonId
     Image {
         id: image
         antialiasing: true     
-        scale: (1/3.7) / ((sourceSize.height) / parentObj.buttonSize)
+        scale: (1 / 3.7) / (sourceSize.height / parentObj.buttonSize)
 
         anchors.verticalCenter: parent.verticalCenter
         anchors.verticalCenterOffset: - parentObj.buttonSize *0.05
         anchors.horizontalCenter: parent.horizontalCenter
         source: parent.imageSource
     }
-
 
     function setFocus(){
         var previousBtn = parentObj.hoveredButton.objectName;
@@ -82,23 +81,27 @@ id: buttonId
     Text  {
         antialiasing: true
         color: {
-            if (mArea.pressed || parentObj.clickedButton.objectName === parent.objectName)
+            if (mArea.pressed || parentObj.clickedButton.objectName === parent.objectName) {
                 return "#cccccc"
-            else if(mArea.containsMouse)
+            }
+            else if(mArea.containsMouse) {
                 return "#333333"
-            else
+            }
+            else {
                 return "#cccccc"
+            }
         }
         text: parent.label
         font.pointSize: Math.sqrt(buttonId.height) * ( Qt.platform.os === "osx" ? 1.3 : 1)
         wrapMode: Text.WordWrap
         anchors.verticalCenter: parent.verticalCenter
         anchors.verticalCenterOffset: {
-            if(image.source == '')
+            if(image.source == '') {
                 return 0
-            else
-                return parentObj.buttonSize *0.20
-
+            }
+            else {
+                return parentObj.buttonSize * 0.20
+            }
         }
         anchors.horizontalCenter: parent.horizontalCenter
         styleColor: "#ffffff"
