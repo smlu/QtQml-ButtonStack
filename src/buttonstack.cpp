@@ -9,15 +9,6 @@
 
 Q_LOGGING_CATEGORY(lcBtnStack, "btn.stack.widget")
 
-#ifndef QT_NO_DEBUG
-#define Q_DEBUG(x) qCDebug(lcBtnStack) << x
-#define Q_DEBUG_FUNINF Q_DEBUG(Q_FUNC_INFO);
-#else
-#define Q_DEBUG(x)
-#define Q_DEBUG_FUNINF
-#endif
-
-
 ButtonStack::ButtonStack(QWidget* parent) :
     QWidget(parent)
 {
