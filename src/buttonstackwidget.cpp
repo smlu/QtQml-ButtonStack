@@ -1,4 +1,4 @@
-#include "buttonstack.h"
+#include "buttonstackwidget.h"
 
 #include <QQmlComponent>
 #include <QQmlEngine>
@@ -9,7 +9,7 @@
 
 Q_LOGGING_CATEGORY(lcBtnStack, "btn.stack.widget")
 
-ButtonStack::ButtonStack(QWidget* parent) :
+ButtonStackWidget::ButtonStackWidget(QWidget* parent) :
     QWidget(parent)
 {
     /* set buttonstack qml */
@@ -33,16 +33,16 @@ ButtonStack::ButtonStack(QWidget* parent) :
     this->setLayout(m_wlayout);
 }
 
-ButtonStack::ButtonStack(const QColor& color, QWidget* parent):
-    ButtonStack(parent)
+ButtonStackWidget::ButtonStackWidget(const QColor& color, QWidget* parent):
+    ButtonStackWidget(parent)
 {
     setBackgroundColor(color);
 }
 
-ButtonStack::~ButtonStack()
+ButtonStackWidget::~ButtonStackWidget()
 {}
 
-void ButtonStack::onButtonFocusChanged(StackButton* btn)
+void ButtonStackWidget::onButtonFocusChanged(StackButton* btn)
 {
     QWidget* widget = m_mapBtnWdgts.value(btn);
     if(widget)
@@ -58,7 +58,7 @@ void ButtonStack::onButtonFocusChanged(StackButton* btn)
     emit buttonFocusChanged(btn);
 }
 
-bool ButtonStack::addButton(StackButton* btn, QWidget* widget)
+bool ButtonStackWidget::addButton(StackButton* btn, QWidget* widget)
 {
     // Create Qml Button component
     QQmlComponent comp(m_rootWidget->engine());
@@ -109,7 +109,7 @@ bool ButtonStack::addButton(StackButton* btn, QWidget* widget)
     return true;
 }
 
-void ButtonStack::removeButton(StackButton* btn)
+void ButtonStackWidget::removeButton(StackButton* btn)
 {
     if(m_mapBtnWdgts.contains(btn))
     {
@@ -123,13 +123,13 @@ void ButtonStack::removeButton(StackButton* btn)
     }
 }
 
-void ButtonStack::setBackgroundColor(const QColor& color)
+void ButtonStackWidget::setBackgroundColor(const QColor& color)
 {
     setStyleSheet(QString("background-color: %1;").arg(color.name()));
     m_rootItem->setProperty("color", QVariant(color.name()));
 }
 #include <QAbstractButton>
-void ButtonStack::switchButton(StackButton* btn1, StackButton* btn2)
+void ButtonStackWidget::switchButton(StackButton* btn1, StackButton* btn2)
 {
     if(!btn1 || !btn2) {
         return;
@@ -144,17 +144,17 @@ void ButtonStack::switchButton(StackButton* btn1, StackButton* btn2)
     btn2->m_item->setPosition(pos1);
 }
 
-void ButtonStack::setContentsMargins(int n)
+void ButtonStackWidget::setContentsMargins(int n)
 {
     m_wlayout->setMargin(n);
 }
 
-void ButtonStack::setContentsMargins(int l, int t, int r, int b)
+void ButtonStackWidget::setContentsMargins(int l, int t, int r, int b)
 {
     m_wlayout->setContentsMargins(l, t, r ,b );
 }
 
-void ButtonStack::resizeEvent(QResizeEvent* e)
+void ButtonStackWidget::resizeEvent(QResizeEvent* e)
 {
     e->ignore();
     m_rootItem->setHeight(e->size().height());
@@ -179,7 +179,7 @@ void ButtonStack::resizeEvent(QResizeEvent* e)
     e->accept();
 }
 
-void ButtonStack::setLayoutSpacing(int n)
+void ButtonStackWidget::setLayoutSpacing(int n)
 {
     m_wlayout->setSpacing(n);
 }

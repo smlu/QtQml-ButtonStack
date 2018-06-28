@@ -5,7 +5,7 @@
 #include <QString>
 #include <QLabel>
 
-#include "../src/buttonstack.h"
+#include "../src/buttonstackwidget.h"
 #include "../src/stackbutton.h"
 
 
@@ -70,7 +70,7 @@ int main(int argc, char *argv[])
     StackButton btn4("Button 4");
 
     // Init button stack
-    ButtonStack bs;
+    ButtonStackWidget bs;
     bs.addButton(&btn1, w1);
     bs.addButton(btn2, w2);
     bs.addButton(&btn3, w3);

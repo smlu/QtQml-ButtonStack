@@ -8,12 +8,7 @@
 
 #include <QQuickWidget>
 #include <QQuickItem>
-
 #include <QMap>
-#include <QPair>
-
-
-#include <unordered_map>
 
 #include "stackbutton.h"
 
@@ -28,7 +23,7 @@ public:
     * @param Background color
     * @param Parent widget
     */
-    explicit ButtonStackWidget(const QColor&, QWidget *parent = nullptr);
+    explicit ButtonStackWidget(const QColor&, QWidget* parent = nullptr);
     virtual ~ButtonStackWidget();
 
     bool addButton(StackButton* btn, QWidget* widget = nullptr);

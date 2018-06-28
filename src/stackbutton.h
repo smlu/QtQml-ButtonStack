@@ -202,7 +202,7 @@ private:
     QColor m_pressColor = "#333333";
     QColor m_hoverColor = "#cccccc";
 
-    friend class ButtonStack;
+    friend class ButtonStackWidget;
     QPointer<QQuickItem> m_item;
 };
 #endif // STACKBUTTON_H
