@@ -13,6 +13,10 @@
 #include <QPair>
 
 
+#include <unordered_map>
+
+#include "stackbutton.h"
+
 class ButtonStack : public QWidget
 {
     Q_OBJECT
@@ -26,48 +30,19 @@ public:
     explicit ButtonStack(const QColor&, QWidget *parent = nullptr);
     virtual ~ButtonStack();
 
-    /** add new button to the stack
-     *
-     * @param button name
-     * @param button icon source path
-     * @param the color of button
-     * @param the color of button when clicked
-     * @param the color of button when hover over
-     *
-     * @return success
-     */
-    bool addButton(const QString& , const QUrl& ImageSource= QUrl("") ,const QColor& button= "",  const QColor& onClick= "", const  QColor& onHover= "");
+    bool addButton(StackButton* btn, QWidget* widget = nullptr);
 
-    /** add new button to the stack
-     *
-     * @param button name
-     * @param qwidget to control
-     * @param button icon source path
-     * @param the color of button
-     * @param the color of button when clicked
-     * @param the color of button when hover over
-     *
-     * @return success
-     */
-    bool addButton(const QString&, QWidget*, const QUrl& ImageSource= QUrl("") ,const QColor& button= "",  const QColor& onClick= "", const QColor& onHover= "");
-
-    /** remove button
-     *
-     * @param button name
-     */
-    void removeButton(const QString&);
-
-    /** set focus on button
-     *
-     * @param button name
-     */
-    void setButtonFocus(const QString&);
+   /** remove button
+    *
+    * @param button
+    */
+    void removeButton(StackButton* btn);
 
     /** set widget background color */
     void setBackgroundColor(const QColor&);
 
     /** switch button*/
-    void switchButton(const QString&, const QString&);
+    void switchButton(StackButton* btn1, StackButton* btn2);
 
     /** set space between buttonstack and widget
      *
@@ -87,23 +62,23 @@ public:
     */
     void setContentsMargins(int, int, int, int);
 
+signals:
+    void buttonClicked(StackButton* btn);
+    void buttonFocusChanged(StackButton* btn);
+
 protected:
-    QQuickWidget* rootWidg;
-    QQuickItem*   rootItem;
-    QMap<QString, QPair<QWidget*, QQuickItem*> > buttonMap;
+    QQuickWidget* m_rootWidget;
+    QQuickItem*   m_rootItem;
+    QMap<StackButton*, QWidget*> m_mapBtnWdgts;
     virtual void resizeEvent(QResizeEvent*);
 
 private:
-    void Init();
-    QHBoxLayout* m_layout;
-
-signals:
-    void clicked(const QString&);
-    void focusChanged(const QString&, const QString&);
+    QQuickItem* m_blayout;
+    QHBoxLayout* m_wlayout;
 
 private slots:
-    void buttonClicked(const QString&);
-    void buttonFocusChanged(const QString&, const QString&);
+    void onButtonFocusChanged(StackButton* btn);
 };
+
 
 #endif // BUTTONSTACK_H

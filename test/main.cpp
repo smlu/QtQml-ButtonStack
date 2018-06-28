@@ -3,8 +3,23 @@
 #include <QWidget>
 #include <QObject>
 #include <QString>
+#include <QLabel>
 
 #include "../src/buttonstack.h"
+#include "../src/stackbutton.h"
+
+
+void AddLabelToWidget(QWidget* w, QString labelText)
+{
+    QLabel* label = new QLabel(qMove(labelText), w);
+    label->setAlignment(Qt::AlignCenter);
+    auto font = label->font();
+    font.setPointSize(14);
+    label->setFont(font);
+
+    QBoxLayout* layout = new QVBoxLayout(w);
+    layout->addWidget(label);
+}
 
 class Widget4 : public QWidget
 {
@@ -13,29 +28,9 @@ public:
     inline explicit Widget4(QWidget* parent = nullptr) :   QWidget(parent)
     {
         setWindowFlags(Qt::Dialog | Qt::WindowStaysOnTopHint);
-        this->resize(250,250);
-        setStyleSheet("background-color: rgb(0,0 ,255);");
-        m_btnName  = "Button 4";
+        resize(250,250);
+        setStyleSheet("background-color: rgb(0,150 ,255);");
     }
-
-    inline const QString getBtnName() const{
-        return m_btnName;
-    }
-
-public slots:
-    inline void focusChangeSet(QString fromBtn, QString toBtn)
-    {
-        Q_UNUSED(fromBtn)
-        if(toBtn == m_btnName) {
-            this->show();
-        }
-        else {
-            this->hide();
-        }
-    }
-
-private:
-    QString  m_btnName;
 };
 
 #include "main.moc"
@@ -48,31 +43,55 @@ int main(int argc, char *argv[])
     window.resize(480, 480);
 
     QWidget* w1 = new QWidget;
+    AddLabelToWidget(w1, "Widget 1");
     w1->setStyleSheet("background-color: rgb(255,180 ,30);");
 
     QWidget* w2 = new QWidget;
+    AddLabelToWidget(w2, "Widget 2");
     w2->setStyleSheet("background-color: rgb(255,255 ,0);");
 
     QWidget* w3 = new QWidget;
+    AddLabelToWidget(w3, "Widget 3");
     w3->setStyleSheet("background-color: rgb(255,0,255);");
 
     Widget4* w4 = new Widget4;
-
-    ButtonStack* bs = new ButtonStack;
-    bs->addButton("Button 1", w1, QUrl("http://simpleicon.com/wp-content/uploads/smile-128x128.png"), QColor(0, 150, 0), QColor(150, 0, 0), QColor(150, 150, 255));
-    bs->addButton("Button 2", w2);
-    bs->addButton("Button 3", w3);
-    bs->addButton(w4->getBtnName());
+    AddLabelToWidget(w4, "Widget 4");
 
 
+    StackButton btn1;
+    btn1.setText("Button1")
+        .setIconUrl(QUrl("http://simpleicon.com/wp-content/uploads/smile-128x128.png"))
+        .setBackgroundColor(QColor(0, 150, 0))
+        .setPressColor(QColor(150, 0, 0))
+        .setHoverColor(QColor(150, 150, 255));
 
-    bs->setButtonFocus("Button 1");
-    QObject::connect(bs, SIGNAL(focusChanged(QString,QString)), w4, SLOT(focusChangeSet(QString,QString)));
+    StackButton* btn2 = new StackButton("Button 2");
+    StackButton btn3("Button 3");
+    StackButton btn4("Button 4");
 
-    window.setCentralWidget(bs);
+    // Init button stack
+    ButtonStack bs;
+    bs.addButton(&btn1, w1);
+    bs.addButton(btn2, w2);
+    bs.addButton(&btn3, w3);
+    bs.addButton(&btn4);
 
- //bs->resize(bs->width(), window.height());
+    window.setCentralWidget(&bs);
     window.show();
+
+    btn2->click(); // Set btn2 checked
+    QObject::connect(btn2, &StackButton::clicked, [&](){
+        //bs.removeButton(&btn2);
+        btn2->deleteLater();
+    });
+
+    QObject::connect(&btn3, &StackButton::clicked, [&](){
+        bs.switchButton(&btn1, &btn3);
+    });
+
+    // Show w4 when btn4 focus is True
+    QObject::connect(&btn4, &StackButton::focusChanged, w4, &Widget4::setVisible);
+
     return a.exec();
 }
 

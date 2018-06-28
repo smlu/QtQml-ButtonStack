@@ -1,87 +1,113 @@
 import QtQuick 2.3
 
 Rectangle  {
-id: buttonId
-    /* to change button rename these vars */ 
-    property string label;
-    property string imageSource;
-    property color buttonColor;
-    property color onClickColor;
-    property color onHoverColor;
-    property Rectangle parentObj: buttonstack;
-    property Rectangle clickedButton;
+    id: rootItem
+    /* Button properties */
+    property alias text: textItem.text
+    property string iconSource;
+    property color backgroundColor;
+    property color pressColor;
+    property color hoverColor;
+    property bool checked: stackObj.checkedButton === rootItem;
+    property Rectangle stackObj: null;
+
+    signal pressed();
+    signal released()
+    signal clicked();
+
+    function click() {
+        mArea.clicked(Qt.MouseEvent);
+    }
+
     /**************************************************************/
 
-
-    width:  parentObj.buttonSize
-    height: parentObj.buttonSize
-    color: {
-        if (mArea.pressed || parentObj.clickedButton.objectName === objectName)
-            return onClickColor
-        else if(mArea.containsMouse)
-            return onHoverColor
-        else
-            return buttonColor
-    }
+    width:  stackObj.buttonSize
+    height: stackObj.buttonSize
 
     border  { width: 0 }
     smooth: true
-    radius: 0    
+    radius: 0
     antialiasing: true
     border.color: "#000000"
+    color: {
+        if (mArea.pressed || stackObj.checkedButton === rootItem){
+            return pressColor
+        }
+        else if(mArea.containsMouse){
+            return hoverColor
+        }
+        else{
+            return backgroundColor
+        }
+    }
+
+    Component.onDestruction: {
+        if(stackObj) {
+            if(stackObj.checkedButton === rootItem) {
+                stackObj.checkedButton = stackObj.__nullButton
+            }
+
+            if(stackObj.hoveredButton === rootItem) {
+                stackObj.hoveredButton = stackObj.checkedButton;
+            }
+        }
+    }
 
     Image {
         id: image
         antialiasing: true     
-        scale: (1 / 3.7) / (sourceSize.height / parentObj.buttonSize)
+        scale: (1 / 3.7) / (sourceSize.height / stackObj.buttonSize)
 
-        anchors.verticalCenter: parent.verticalCenter
-        anchors.verticalCenterOffset: - parentObj.buttonSize *0.05
-        anchors.horizontalCenter: parent.horizontalCenter
-        source: parent.imageSource
-    }
-
-    function setFocus(){
-        var previousBtn = parentObj.hoveredButton.objectName;
-        parentObj.clickedButton= buttonId;
-        parentObj.hoveredButton = buttonId;
-        parentObj.focusChanged(previousBtn, parentObj.hoveredButton.objectName)
-        parentObj.clicked(parentObj.clickedButton.objectName)
+        anchors.verticalCenter: rootItem.verticalCenter
+        anchors.verticalCenterOffset: - stackObj.buttonSize * 0.05
+        anchors.horizontalCenter: rootItem.horizontalCenter
+        source: parent.iconSource
     }
 
     MouseArea {
-        id:mArea
-        anchors.fill: parent
+        id: mArea
+        anchors.fill: rootItem
         acceptedButtons: Qt.LeftButton
-        onClicked: {
-            parentObj.clickedButton = buttonId;
-
-            //emit Signal            
-            parentObj.clicked(buttonId.objectName)
-        }
         hoverEnabled: true
-        onEntered: {
-            if(parentObj.clickedButton.objectName !== parent.objectName) {
-                parentObj.hoveredButton = buttonId;
+        //focus: fals
 
-                // emit signal
-                parentObj.focusChanged(parentObj.clickedButton.objectName, buttonId.objectName)
+        onPressed: {
+            rootItem.pressed();
+        }
+
+        onReleased: {
+            rootItem.released();
+        }
+
+        onClicked: {
+            stackObj.checkedButton = rootItem;
+            rootItem.forceActiveFocus();
+            rootItem.clicked();
+        }
+
+        onEntered: {
+            if(stackObj.checkedButton !== rootItem) {
+                stackObj.hoveredButton = rootItem;
+                rootItem.forceActiveFocus();
             }
         }
-        onExited: {
-            if(parentObj.clickedButton.objectName !== parent.objectName) {
-                parentObj.hoveredButton = parentObj.clickedButton;
 
-                // emit signal
-                parentObj.focusChanged(buttonId.objectName, parentObj.clickedButton.objectName)
+        onExited: {
+            if(stackObj.checkedButton !== rootItem) {
+                stackObj.hoveredButton = stackObj.checkedButton;
+                stackObj.checkedButton.forceActiveFocus();
+                if(stackObj.checkedButton === stackObj.__nullButton) {
+                    stackObj.forceActiveFocus();
+                }
             }
         }
     }
 
     Text  {
+        id: textItem
         antialiasing: true
         color: {
-            if (mArea.pressed || parentObj.clickedButton.objectName === parent.objectName) {
+            if (mArea.pressed || stackObj.checkedButton === rootItem) {
                 return "#cccccc"
             }
             else if(mArea.containsMouse) {
@@ -91,19 +117,19 @@ id: buttonId
                 return "#cccccc"
             }
         }
-        text: parent.label
-        font.pointSize: Math.sqrt(buttonId.height) * ( Qt.platform.os === "osx" ? 1.3 : 1)
+
+        font.pointSize: Math.sqrt(rootItem.height) * ( Qt.platform.os === "osx" ? 1.3 : 1)
         wrapMode: Text.WordWrap
-        anchors.verticalCenter: parent.verticalCenter
+        anchors.verticalCenter: rootItem.verticalCenter
         anchors.verticalCenterOffset: {
             if(image.source == '') {
                 return 0
             }
             else {
-                return parentObj.buttonSize * 0.20
+                return stackObj.buttonSize * 0.20
             }
         }
-        anchors.horizontalCenter: parent.horizontalCenter
+        anchors.horizontalCenter: rootItem.horizontalCenter
         styleColor: "#ffffff"
     }
 }

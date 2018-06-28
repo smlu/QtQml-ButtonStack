@@ -20,74 +20,47 @@ Rectangle {
     signal focusChanged(string fromObjName, string toObjName)
 
     // signal when button is clicked
-    signal clicked(string objectName)    
+    signal clicked(string objectName)
 
     // signal on error
     signal qmlErrors(string Error)
 
     // global button properties
     property var button: Qt.createComponent("qrc:/qml/button.qml")
-    property color defaultButtonColor:  "#1E1E1E"
-    property color defaultOnHoverColor: "#cccccc"
-    property color defaultOnClickColor: "#333333"
-    property int numOfButtons: 0
-    property int buttonSize:   (height/numOfButtons)+1
-    property Rectangle clickedButton: Rectangle{objectName:"default"; x: -100; y: -(buttonstack.y - 100 + focusMarker.height); visible: false}
-    property Rectangle hoveredButton: clickedButton
+    readonly property int __numOfButtons: layout.children.length
+    property int buttonSize:   __numOfButtons ? (height / __numOfButtons) + 1 : 0
+    property Rectangle checkedButton: __nullButton
+    property Rectangle hoveredButton: checkedButton
 
+    // Private properties
+    readonly property Rectangle __nullButton: Rectangle{ x: -100; y: -buttonSize ; visible: false }
 
-    // focused button marker
+    // button marker
    Rectangle{
         id: focusMarker
         objectName: "__focusMarker"
         width: Math.sqrt(buttonstack.height)
         height:Math.sqrt(buttonstack.height)
-        x: buttonstack.buttonSize - (width/2)
-        y: buttonstack.hoveredButton.y + (buttonstack.buttonSize /2) - (height /2);
+        x: buttonSize - (width/2)
+        y: hoveredButton.y + (buttonSize /2) - (height /2);
         rotation: 45
-        color: buttonstack.hoveredButton.color
+        color: hoveredButton.color
         visible: hoveredButton.visible
+
         Behavior on y {
+            id: yBehavior
             NumberAnimation {
+                id: yAnimation
                 duration: 600
                 easing.type: Easing.OutBack
             }
         }
     }
 
-    function addButton(name, imageSource, buttonColor, onClickColor, onHoverColor) {
-
-        if(typeof(buttonColor) ==='undefined' || buttonColor  === '') buttonColor  = defaultButtonColor;
-        if(typeof(onClickColor)==='undefined' || onClickColor === '') onClickColor = defaultOnClickColor;
-        if(typeof(onHoverColor)==='undefined' || onHoverColor === '') onHoverColor = defaultOnHoverColor;
-
-        var sprite = button.incubateObject(layout, {                                               
-            "id": button + name,
-            "objectName": name,
-            "buttonColor":  buttonColor,
-            "onClickColor": onClickColor,
-            "onHoverColor": onHoverColor,
-            "label": name,
-            "imageSource": imageSource
-        });
-
-        if (sprite !== null) {
-            numOfButtons++;
-            return true;
-        }
-        else {
-            // Error Handling
-            qmlErrors("error creating button " + name);
-            console.log("Error creating button " + name );
-        }
-
-        return false;
-    }
-
     /* Layout **/
-
     Column {
         id: layout
+        objectName: "layout"
         width: buttonstack.width
         height: buttonstack.height
         z: 1
@@ -98,13 +71,6 @@ Rectangle {
         transformOrigin: Item.Center
         antialiasing: true
         scale: 1
-        spacing: 0/*
-        Component.o: {
-            var tmp = this.children;
-            var copy = [];
-            for (var i = 0; i < tmp.length; ++i)
-                copy[i] = tmp[i]
-           buttonList = copy;
-        }*/
+        spacing: 0
     }
 }

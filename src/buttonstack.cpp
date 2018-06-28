@@ -1,11 +1,13 @@
 #include "buttonstack.h"
 
+#include <QQmlComponent>
+#include <QQmlEngine>
 
 #include <QLoggingCategory>
 #include <QDebug>
 #include <QVariant>
 
-Q_LOGGING_CATEGORY(lcBtnStack, "btn.stack")
+Q_LOGGING_CATEGORY(lcBtnStack, "btn.stack.widget")
 
 #ifndef QT_NO_DEBUG
 #define Q_DEBUG(x) qCDebug(lcBtnStack) << x
@@ -19,206 +21,167 @@ Q_LOGGING_CATEGORY(lcBtnStack, "btn.stack")
 ButtonStack::ButtonStack(QWidget* parent) :
     QWidget(parent)
 {
-    Q_DEBUG_FUNINF
-    Init();  
-}
-
-ButtonStack::ButtonStack(const QColor& color, QWidget* parent):
-    QWidget(parent)
-{
-    Q_DEBUG_FUNINF
-    Init();
-    setBackgroundColor(color);
-}
-
-void ButtonStack::Init()
-{
-    Q_DEBUG_FUNINF    
-
     /* set buttonstack qml */
-    rootWidg = new QQuickWidget(QUrl("qrc:/qml/stack.qml"));
+    m_rootWidget = new QQuickWidget(QUrl("qrc:/qml/stack.qml"), this);
     //rootWidg->setResizeMode(QQuickWidget::SizeViewToRootObject);
 
     // get buttonstack item
-    rootItem = rootWidg->rootObject();
+    m_rootItem = m_rootWidget->rootObject();
+    Q_CHECK_PTR(m_rootItem);
 
-    /* connect buttonstack */
-    connect(rootItem, SIGNAL(clicked(QString)), SLOT(buttonClicked(QString)));
-    connect(rootItem, SIGNAL(focusChanged(QString, QString)), SLOT(buttonFocusChanged(QString, QString)));
+    // Get Button layout
+    m_blayout = m_rootItem->findChild<QQuickItem*>("layout");
+    Q_CHECK_PTR(m_blayout);
 
     /* set main layout */
-    m_layout = new QHBoxLayout();
-    m_layout->addWidget(rootWidg,0, Qt::AlignLeft);
-    m_layout->setSpacing(0);
-    m_layout->setMargin(0);
-    m_layout->setStretch(0,0);
-    this->setLayout(m_layout);    
+    m_wlayout = new QHBoxLayout(this);
+    m_wlayout->addWidget(m_rootWidget,0, Qt::AlignLeft);
+    m_wlayout->setSpacing(0);
+    m_wlayout->setMargin(0);
+    m_wlayout->setStretch(0,0);
+    this->setLayout(m_wlayout);
+}
+
+ButtonStack::ButtonStack(const QColor& color, QWidget* parent):
+    ButtonStack(parent)
+{
+    setBackgroundColor(color);
 }
 
 ButtonStack::~ButtonStack()
+{}
+
+void ButtonStack::onButtonFocusChanged(StackButton* btn)
 {
-    Q_DEBUG_FUNINF
-    delete rootItem;
-    delete rootWidg;
-    delete m_layout;
-}
-
-void ButtonStack::buttonClicked(const QString& button)
-{
-    Q_DEBUG_FUNINF
-    Q_DEBUG("button:" << button << "has been clicked");
-
-    emit clicked(button);
-}
-
-void ButtonStack::buttonFocusChanged(const QString& fromButton, const QString& toButton)
-{
-    Q_DEBUG_FUNINF
-    Q_DEBUG("focus has changed from button:" << fromButton << "to button:" << toButton);
-
-    /* if previous button has widget, hide it*/
-    if(buttonMap[fromButton].first){
-        buttonMap[fromButton].first->hide();
-    }
-
-    /* does current selected button has widget assignet to it*/
-    if(buttonMap[toButton].first)
+    QWidget* widget = m_mapBtnWdgts.value(btn);
+    if(widget)
     {
-        Q_DEBUG("widget width:" << buttonMap[toButton].first->width());
-
-        /* resize our widget to width of buttonstack + width of widget assigned to selected button */
-        //this->setMinimumWidth(rootWidg->width() + buttonMap[toButton].first->width());
-
-        /* show widget that is assigned to selected button */
-        buttonMap[toButton].first->show();
-    }
-
-    emit focusChanged(fromButton, toButton);
-}
-
-bool ButtonStack::addButton(const QString& name, const QUrl& ImageSource, const QColor& button,  const QColor& onClick, const QColor& onHover)
-{
-    Q_DEBUG_FUNINF
-    return addButton(name, nullptr, ImageSource, button, onClick, onHover);
-}
-
-bool ButtonStack::addButton(const QString& name, QWidget* qwidget, const QUrl& ImageSource, const QColor& button,  const QColor& onClick, const QColor& onHover)
-{
-    Q_DEBUG_FUNINF
-
-    /* call qml methode to create button */
-    QVariant fSucceed;
-    QMetaObject::invokeMethod
-    (
-        rootItem,
-        "addButton",
-        Q_RETURN_ARG(QVariant,fSucceed),
-        Q_ARG(QVariant, name),
-        Q_ARG(QVariant, ImageSource),
-        Q_ARG(QVariant, ((button.isValid())  ? button.name() : "")),
-        Q_ARG(QVariant, ((onClick.isValid()) ? onClick.name() : "")),
-        Q_ARG(QVariant, ((onHover.isValid()) ? onHover.name() : ""))
-    );
-
-    /* if succeedd add button to buttonMap */
-    if (fSucceed.toBool())
-    {
-        Q_DEBUG("Button" << name << "has been successfully created");
-
-        QQuickItem * qButtonItem = rootItem->findChild<QQuickItem *>(name);
-        if(qButtonItem)
-        {
-            if(qwidget)
-            {
-                m_layout->addWidget(qwidget);
-                qwidget->hide();
-            }
-
-            buttonMap[name] = QPair<QWidget*, QQuickItem*>(qwidget, qButtonItem);
-            Q_DEBUG("Button" << name << "has been added to the map");
+        if(btn->hasFocus()) {
+            widget->show();
         }
-        else{
-            qCCritical(lcBtnStack) << Q_FUNC_INFO << "Could not find child" << name;
+        else {
+            widget->hide();
         }
     }
-    else{
-        qCCritical(lcBtnStack)<< Q_FUNC_INFO << "Something went wrong while trying to create button" << name;
-    }
 
-    return fSucceed.toBool();
+    emit buttonFocusChanged(btn);
 }
 
-void ButtonStack::removeButton(const QString& button)
+bool ButtonStack::addButton(StackButton* btn, QWidget* widget)
 {
-    Q_DEBUG_FUNINF
-
-    if(buttonMap.contains(button))
+    // Create Qml Button component
+    QQmlComponent comp(m_rootWidget->engine());
+    comp.loadUrl(QUrl("qrc:/qml/button.qml"));
+    if(!comp.isReady())
     {
-        m_layout->removeWidget(buttonMap[button].first);
-        delete buttonMap[button].second;
-        buttonMap.remove(button);
+        qCCritical(lcBtnStack) << "Qml component not ready!";
+        return false;
     }
 
-    /* re-set button size */
-    rootItem->setProperty("numOfButtons", QVariant(buttonMap.count()));
+    auto btnQmlItem = qobject_cast<QQuickItem*>(comp.beginCreate(m_rootWidget->rootContext()));
+    if(!btnQmlItem)
+    {
+        qCCritical(lcBtnStack) << "Could not create button qml component!";
+        return false;
+    }
+
+    Q_ASSERT(btnQmlItem->setProperty("stackObj", QVariant::fromValue(m_rootItem)));
+    btnQmlItem->setParentItem(m_blayout);
+    btnQmlItem->setParent(m_rootItem);
+    comp.completeCreate();
+
+    /* Add qml component to btn */
+    btn->setQuickItem(btnQmlItem);
+
+    /* Add widget to layout */
+    if(widget)
+    {
+        m_wlayout->addWidget(widget);
+        widget->hide();
+    }
+
+    /* Add btn and widget to map */
+    m_mapBtnWdgts[btn] = widget;
+
+    connect(btn, &StackButton::focusChanged, this, [this, btn](bool){
+        onButtonFocusChanged(btn);
+    });
+
+    connect(btn, &StackButton::clicked, this, [this, btn](){
+        emit buttonClicked(btn);
+    });
+
+    connect(btn, &StackButton::destroyed, this, [this](QObject* btn){
+        removeButton(static_cast<StackButton*>(btn));
+    });
+
+    return true;
 }
 
-void ButtonStack::setButtonFocus(const QString& button)
+void ButtonStack::removeButton(StackButton* btn)
 {
-    Q_DEBUG_FUNINF
-    QMetaObject::invokeMethod(buttonMap[button].second, "setFocus");
+    if(m_mapBtnWdgts.contains(btn))
+    {
+        auto w = (m_mapBtnWdgts.value(btn));
+        w->hide();
+        m_wlayout->removeWidget(w);
+
+        m_mapBtnWdgts.remove(btn);
+        btn->disconnect(this);
+        btn->destroyItem();
+    }
 }
 
 void ButtonStack::setBackgroundColor(const QColor& color)
 {
-    Q_DEBUG_FUNINF
     setStyleSheet(QString("background-color: %1;").arg(color.name()));
-    rootItem->setProperty("color", QVariant(color.name()));
+    m_rootItem->setProperty("color", QVariant(color.name()));
 }
-
-void ButtonStack::switchButton(const QString & button1, const QString& button2)
+#include <QAbstractButton>
+void ButtonStack::switchButton(StackButton* btn1, StackButton* btn2)
 {
-    Q_DEBUG_FUNINF
-    QQuickItem* tmp_btn = buttonMap[button1].second;
-    buttonMap[button1].second->setPosition(buttonMap[button2].second->position());
-    buttonMap[button2].second->setPosition(tmp_btn->position());
+    if(!btn1 || !btn2) {
+        return;
+    }
+
+    if(!btn2->m_item || !btn2->m_item) {
+        return;
+    }
+
+    auto pos1 = btn1->m_item->position();
+    btn1->m_item->setPosition(btn2->m_item->position());
+    btn2->m_item->setPosition(pos1);
 }
 
 void ButtonStack::setContentsMargins(int n)
 {
-    Q_DEBUG_FUNINF
-    m_layout->setMargin(n);
+    m_wlayout->setMargin(n);
 }
 
 void ButtonStack::setContentsMargins(int l, int t, int r, int b)
 {
-    Q_DEBUG_FUNINF
-    m_layout->setContentsMargins(l, t, r ,b );
+    m_wlayout->setContentsMargins(l, t, r ,b );
 }
 
 void ButtonStack::resizeEvent(QResizeEvent* e)
 {
-    Q_DEBUG_FUNINF
     e->ignore();
+    m_rootItem->setHeight(e->size().height());
 
-    Q_DEBUG(e->size());
-    rootItem->setHeight(e->size().height());
-
-    if(rootItem->width() > 0)
+    if(m_rootItem->width() > 0)
     {
-        auto rootSize = rootItem->size().toSize();
-        rootWidg->setMinimumWidth(rootSize.width());
-        rootWidg->resize(rootSize.width(), e->size().height());
+        auto rootSize = m_rootItem->size().toSize();
+        m_rootWidget->setMinimumWidth(rootSize.width());
+        m_rootWidget->resize(rootSize.width(), e->size().height());
     }
     //this->resize(e->size());
 
-    QPair<QWidget*, QQuickItem*>b;
-    for(auto& b : buttonMap)
+    for(auto& w : m_mapBtnWdgts)
     {
-        if(b.first)
+        if(w)
         {
-            auto newWidth = e->size().width() - rootWidg->width();
-            b.first->resize(newWidth, e->size().height());
+            auto width = e->size().width() - m_rootWidget->width();
+            w->resize(width, e->size().height());
         }
     }
 
@@ -227,6 +190,5 @@ void ButtonStack::resizeEvent(QResizeEvent* e)
 
 void ButtonStack::setLayoutSpacing(int n)
 {
-    Q_DEBUG_FUNINF
-    m_layout->setSpacing(n);
+    m_wlayout->setSpacing(n);
 }
