@@ -17,48 +17,65 @@
 
 #include "stackbutton.h"
 
-class ButtonStack : public QWidget
+class ButtonStackWidget : public QWidget
 {
     Q_OBJECT
 public:
-    explicit ButtonStack(QWidget *parent = nullptr);
-    /* Constructor
-     *
-     * @param background color
-     * @param parent widget
-     */
-    explicit ButtonStack(const QColor&, QWidget *parent = nullptr);
-    virtual ~ButtonStack();
+    explicit ButtonStackWidget(QWidget *parent = nullptr);
+   /**
+    * Constructor
+    *
+    * @param Background color
+    * @param Parent widget
+    */
+    explicit ButtonStackWidget(const QColor&, QWidget *parent = nullptr);
+    virtual ~ButtonStackWidget();
 
     bool addButton(StackButton* btn, QWidget* widget = nullptr);
 
-   /** remove button
+   /**
+    * Removes button
     *
-    * @param button
+    * @param Button
     */
     void removeButton(StackButton* btn);
 
-    /** set widget background color */
+   /**
+    * Sets widget background color
+    *
+    * @param Color
+    */
     void setBackgroundColor(const QColor&);
 
-    /** switch button*/
+   /**
+    * Changes bosition of button btn1 with button btn2 and vice versa
+    *
+    * @param Button
+    * @param Button
+    */
     void switchButton(StackButton* btn1, StackButton* btn2);
 
-    /** set space between buttonstack and widget
-     *
-     * @param nSpace
-     */
+   /**
+    * Sets space between buttonstack and widget
+    *
+    * @param Space
+    */
     void setLayoutSpacing(int);
 
-    /** set content margin */
+   /**
+    * Sets content margin
+    *
+    * @param Margin
+    */
     void setContentsMargins(int);
 
-    /** set content margin
-     *
-     * @param left
-     * @param top
-     * @param right
-     * @param bottom
+   /**
+    * Sets content margin
+    *
+    * @param left
+    * @param top
+    * @param right
+    * @param bottom
     */
     void setContentsMargins(int, int, int, int);
 

@@ -8,8 +8,8 @@ RESOURCES += \
     src/buttonstack.qrc
 
 HEADERS += \
-    src/buttonstack.h \
-    $$PWD/src/stackbutton.h
+    $$PWD/src/stackbutton.h \
+    $$PWD/src/buttonstackwidget.h
 
 SOURCES += \
-    src/buttonstack.cpp \
+    $$PWD/src/buttonstackwidget.cpp
